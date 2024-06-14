@@ -39,7 +39,8 @@ exports.shortenUrl = catchAsync(async (req, res) => {
     // Chek this  base url or original url is valid
 
     if (!validUrl.isUri(baseUrl) || !validUrl.isUri(originalUrl)) {
-        return res.status(401).json('Invalid base URL or Original URL');
+        return next(new AppError('Invalid base URL or Original URL', 401));
+        
     }
 
     let url = await Url.findOne({ originalUrl });
@@ -57,11 +58,15 @@ exports.shortenUrl = catchAsync(async (req, res) => {
     })
 });
 
-// Redirect URL when  
+// Redirect URL when access with you shortURL e count a click 
 exports.redirectUrl = catchAsync(async(req, res) => {
-    const url = await Url.findOne({urlCode: req.params.code});
+    const url = await Url.findOneAndUpdate(
+        {urlCode: req.params.code},
+        {$inc:{click:1}},   
+        {new:true}    
+    );
     
-    return url ? res.redirect(url.longUrl) : res.status(404).json('No URL found');
+    return url ? res.redirect(url.longUrl) : next(new AppError('No URL found', 404));
 });
 
 

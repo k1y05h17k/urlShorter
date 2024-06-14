@@ -2,6 +2,9 @@ const express = require('express');
 const morgan = require('morgan');
 
 
+const AppError = require('./utils/appError');
+const userRouter = require('./routes/userRoutes');
+
 const app = express();
 
 // This command show whats enviorement is running
@@ -23,6 +26,7 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use('/api/v1/users', userRouter);
 
 module.exports = app;
 

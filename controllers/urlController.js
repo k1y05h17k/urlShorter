@@ -2,10 +2,10 @@ const Url = require('./../models/urlModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
-const User = require('../models/userModel');
 const validUrl = require('valid-url');
 const shortid = require('shortid');
 const dotenv = require('dotenv');
+
 
 dotenv.config();
 
@@ -30,7 +30,6 @@ const generateUniqueUrlCode = async () => {
     }
     return urlCode;
 }
-
 
 // Create a new short url
 exports.shortenUrl = catchAsync(async (req, res) => {
@@ -72,7 +71,7 @@ exports.redirectUrl = catchAsync(async(req, res) => {
 
 // Delete add date of 
 exports.deleteUrl = catchAsync(async (req, res, next) => {
-    await User.findByIdAndUpdate(req.url.id, { deleteAt: Date.now });
+    await Url.findByIdAndUpdate(req.url.id, { deleteAt: Date.now });
 
     res.status(204).json({
         staus: 'success',

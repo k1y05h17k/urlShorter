@@ -13,20 +13,19 @@ const signToken = id => {
 
 };
 
-
 // Function to create a new token for User
 const createSendToken = (user, statusCode, res) => {
     const token = signToken(user._id);
     const cookieOptions = {
         expires: new Date(
-            Date.now() + process.env.JWT.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
         httpOnly: true
     };
 
     res.cookie('jwt',token, cookieOptions);
 
-    res.staus(statusCode).json({
+    res.status(statusCode).json({
         staus:'sucess',
         token,
         data:{
@@ -57,7 +56,7 @@ exports.signin = catchAsync(async(req, res, next) =>{
     };
 
     // Check if user exists && password is correct
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select('+password -__v');
 
     // IF Wrong User or Invalid Password show this error 401
     if(!user || !(await user.correctPassword(password, user.password))){

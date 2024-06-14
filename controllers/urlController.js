@@ -11,7 +11,7 @@ dotenv.config();
 
 const baseUrl = process.env.BASE_URL;
 
-exports.getAllUrls = factory.getAll(Url);
+// exports.getAllUrls = factory.getAll(Url);
 exports.getUrl = factory.getOne(Url);
 exports.createUrl = factory.createOne(Url);
 exports.updateUrl = factory.updateOne(Url);
@@ -32,15 +32,16 @@ const generateUniqueUrlCode = async () => {
 }
 
 // Create a new short url
-exports.shortenUrl = catchAsync(async (req, res) => {
+exports.shortenUrl = catchAsync(async (req, res,next) => {
     const { originalUrl } = req.body;
 
+    console.log('Base URL:', baseUrl);
+    console.log('Long URL:', originalUrl)
     // Chek this  base url or original url is valid
 
-    if (!validUrl.isUri(baseUrl) || !validUrl.isUri(originalUrl)) {
-        return next(new AppError('Invalid base URL or Original URL', 401));
-        
-    }
+    // if (![baseUrl, originalUrl].every(validUrl.isUri)) {
+    //     return next(new AppError('You are not logged in! Please log in to get access!', 401));
+    //   }
 
     let url = await Url.findOne({ originalUrl });
 
@@ -49,7 +50,7 @@ exports.shortenUrl = catchAsync(async (req, res) => {
     }
     const urlCode = await generateUniqueUrlCode();
     const shortUrl = `${baseUrl}/${urlCode}`;
-    url = await new Url({ longUrl, shortUrl, urlCode }).save();
+    url = await new Url({ originalUrl, shortUrl, urlCode }).save();
 
     res.status(200).json({
         status: 'success',
@@ -58,14 +59,16 @@ exports.shortenUrl = catchAsync(async (req, res) => {
 });
 
 // Redirect URL when access with you shortURL e count a click 
-exports.redirectUrl = catchAsync(async(req, res) => {
-    const url = await Url.findOneAndUpdate(
-        {urlCode: req.params.code},
-        {$inc:{click:1}},   
-        {new:true}    
+exports.redirectUrl = catchAsync(async(req, res, next) => {
+   
+    const url = await Url.findOne(
+        {urlCode: req.params.code}
+        // {$inc:{click:1}},   
+        // {new:true}    
     );
-    
-    return url ? res.redirect(url.longUrl) : next(new AppError('No URL found', 404));
+
+    console.log(req.params.code);
+    return url ? res.redirect(url.originalUrl) : next(new AppError('No URL found', 404));
 });
 
 

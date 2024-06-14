@@ -4,6 +4,7 @@ const morgan = require('morgan');
 
 const AppError = require('./utils/appError');
 const userRouter = require('./routes/userRoutes');
+const urlRouter = require('./routes/urlRoutes');
 
 const app = express();
 
@@ -27,6 +28,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/v1/users', userRouter);
-
+app.use('/api/v1/urls', urlRouter);
 module.exports = app;
 

@@ -67,7 +67,7 @@ exports.signin = catchAsync(async(req, res, next) =>{
 });
 
 // Middleware to protect acess with validate Bearer Token
-exports.protect = catchAsync(async (req, res, next) =>{
+exports.protect = (required = true) => catchAsync(async (req, res, next) =>{
     
     // Getting token and check of it's there
     let token;
@@ -79,9 +79,10 @@ exports.protect = catchAsync(async (req, res, next) =>{
         token = req.headers.authorization.split(' ')[1];
     }
 
-    if(!token){
-        return next(new AppError('You are not logged in! Please log in to get access!', 401));
-    }
+    // if(!token && required){
+    //     // return next();
+    //     return next(new AppError('You are not logged in! Please log in to get access!', 401));
+    // }
 
     // Verification token
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
@@ -93,13 +94,6 @@ exports.protect = catchAsync(async (req, res, next) =>{
             new AppError('The user belonging to this token does no longer exist', 401)
         );
     }
-
-    // A little validation if user changed password after the token issued
-    // if (currentUser.changedPasswordAfter(decoded.iat)) {
-    //     return next(
-    //       new AppError('User recently changed password! Please log in again.', 401)
-    //     );
-    // }
 
     // GRANT ACCESS TO PROTECTED ROUTE
     req.user = currentUser;

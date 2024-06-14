@@ -9,11 +9,11 @@ const urlSchema = new mongoose.Schema({
         default: shortid.generate,
       },
 
-    urlOriginal:{
+    originalUrl:{
         type:String,
         required:[true, 'Please inform a url to shorten']
     },
-    urlShorten:{
+    shortUrl:{
         type: String
     },
 

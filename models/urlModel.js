@@ -30,17 +30,18 @@ const urlSchema = new mongoose.Schema({
 
     deleteAt: {
         type: Date,
-        default: null
+        default: null,
+        select: false
     }
 
 });
 
 // Middleware to filter url diferents of NULL
-// urlSchema.pre(/^find/, function (next) {
-//     // this points to the current query
-//     this.find({ deleteAt: { $ne: null } });
-//     next();
-// });
+urlSchema.pre(/^find/, function (next) {
+    // this points to the current query
+    this.find({ deleteAt: null });
+    next();
+});
 
 const Url = mongoose.model('Url', urlSchema);
 

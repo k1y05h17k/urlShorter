@@ -6,9 +6,10 @@ const router = express.Router();
 
 router.post('/shortenUrl',authController.optionalProtect,urlController.shortenUrl);
 
-router.get('/:code',urlController.redirectUrl);
+router.route('/').get(urlController.getAll)
 
-router.route('/:id').get(urlController.getUrl)
-
-
+router.route('/:code').get(urlController.redirectUrl)
+                    .patch(urlController.updateUrl)
+                    .delete(urlController.deleteUrl);
+                    
 module.exports = router

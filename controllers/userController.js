@@ -1,4 +1,4 @@
-const User = require('../models/urlModel');
+const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory')
 
@@ -10,7 +10,25 @@ exports.createUser = (req, res)=>{
     });
 };
 
-exports.getUser = factory.getOne(User);
+exports.getUser= async (req, res) => {
+    console.log(req.params.id)
+    try {
+      const user = await User.findById(req.params.id);
+      // Tour.findOne({ _id: req.params.id })
+    console.log(user);
+      res.status(200).json({
+        status: 'success',
+        data: {
+            user
+        }
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: 'fail',
+        message: err
+      });
+    }
+  };
 // exports.getAllUsers = factory.getAll(User);
 
 // Do NOT update password with this!

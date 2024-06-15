@@ -9,7 +9,12 @@ const app = require('./app');
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
 
 // Create connection with mongoose
-mongoose.connect(DB).then(con => {
+mongoose.connect(DB,{
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+}).then(con => {
     console.log('DB connection successful!');
 }).catch((err) => console.error('Failed to connect to MongoDB', err));
 

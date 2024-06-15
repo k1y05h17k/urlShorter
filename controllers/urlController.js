@@ -52,9 +52,21 @@ const generateUniqueUrlCode = async () => {
     return urlCode;
 }
 
+const normalizeUrl = (url) => {
+    if (!/^https?:\/\//i.test(url)) {
+      return `https://${url}`;
+    }
+    return url;
+  };
+
+
 // Create a new short url
 exports.shortenUrl = catchAsync(async (req, res,next) => {
     const { originalUrl } = req.body;
+
+    // Normalize the original URL
+    originalUrl = normalizeUrl(originalUrl);
+
 
     console.log('Base URL:', baseUrl);
     console.log('Long URL:', originalUrl)
@@ -71,8 +83,10 @@ exports.shortenUrl = catchAsync(async (req, res,next) => {
     }
     const urlCode = await generateUniqueUrlCode();
     const shortUrl = `${baseUrl}/${urlCode}`;
-    url = await new Url({ originalUrl, shortUrl, urlCode }).save();
 
+    if(req.user){
+        url = await new Url.create({ originalUrl, shortUrl, urlCode,clicks:0 });
+    }    
     res.status(200).json({
         status: 'success',
         data: url
@@ -88,13 +102,12 @@ exports.redirectUrl = catchAsync(async(req, res, next) => {
         { $inc: { clicks: 1 } },
         { new: true }
       );
-      console.log(`https://${url.originalUrl}`);
       
       if (!url) {
         return next(new AppError('No URL found', 404));
       }
  
-    return res.redirect(`https://${url.originalUrl}`);
+    return res.redirect(url.originalUrl);
     
 });
 

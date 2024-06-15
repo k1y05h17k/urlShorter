@@ -67,7 +67,7 @@ exports.signin = catchAsync(async(req, res, next) =>{
 });
 
 // Middleware to protect acess with validate Bearer Token
-exports.protect = (required = true) => catchAsync(async (req, res, next) =>{
+exports.protect = catchAsync(async (req, res, next) =>{
     
     // Getting token and check of it's there
     let token;
@@ -79,10 +79,10 @@ exports.protect = (required = true) => catchAsync(async (req, res, next) =>{
         token = req.headers.authorization.split(' ')[1];
     }
 
-    // if(!token && required){
-    //     // return next();
-    //     return next(new AppError('You are not logged in! Please log in to get access!', 401));
-    // }
+    if(!token && required){
+        // return next();
+        return next(new AppError('You are not logged in! Please log in to get access!', 401));
+    }
 
     // Verification token
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
@@ -100,3 +100,26 @@ exports.protect = (required = true) => catchAsync(async (req, res, next) =>{
     next();
 
 });
+
+exports.optionalProtect = catchAsync(async(req, res, next) => {
+    
+    let token;
+
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+       try{ 
+        token = req.headers.authorization.split(' ')[1];
+        const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+        req.user = await User.findById(decoded.id);
+    }catch(err){
+        req.user = null;
+    }  
+    }else{
+        req.user = null
+    }
+
+    next();
+
+
+});
+
+

@@ -76,10 +76,10 @@ exports.shortenUrl = catchAsync(async (req, res, next) => {
 
 // Redirect URL when access with you shortURL e count a click 
 exports.redirectUrl = catchAsync(async (req, res, next) => {
-  const code = req.params.code;
+  const code = req.params.urlCode;
 
   const url = await Url.findOneAndUpdate(
-    { urlCode: code },
+    { urlCode: urlCode },
     { $inc: { clicks: 1 } },
     { new: true }
   );
@@ -93,24 +93,25 @@ exports.redirectUrl = catchAsync(async (req, res, next) => {
 
 });
 
-
 // Update only originalUrl in the request
 exports.updateUrl = catchAsync(async (req, res, next) => {
   const urlCode = req.params.urlCode;
   const originalUrl = req.body.originalUrl;
-  const urlData = await Url.findByIdAndUpdate({ urlCode: urlCode },
-    { originalUrl: originalUrl },
-    { updateAt: Date.now },
+  const urlData = await Url.findOneAndUpdate({ urlCode: urlCode },
+    {
+      originalUrl: originalUrl,
+      updateAt: Date.now()
+    },
     {
       new: true,
       runValidators: true
     }
-  );
+  ).select('-__v -shortUrl -user +updateAt');
 
   res.status(200).json({
     status: 'success',
     data: {
-      data: urlData
+      url: urlData
     }
   })
 })
@@ -119,9 +120,12 @@ exports.updateUrl = catchAsync(async (req, res, next) => {
 // Delete, this rules mark url with deleted true updated deleteAt to current date
 exports.deleteUrl = catchAsync(async (req, res, next) => {
   const urlCode = req.params.urlCode
-  await Url.findByIdAndUpdate({ urlCode: urlCode },
-    { deleteAt: Date.now },
-    { new: true });
+  await Url.findOneAndUpdate({ urlCode: urlCode },
+    { deleteAt: Date.now() },
+    {
+      new: true,
+      runValidators: true
+    });
 
   res.status(204).json({
     status: 'success',
@@ -130,19 +134,19 @@ exports.deleteUrl = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllUrls = catchAsync(async (req, res) => {
-    let user;
+  let user;
   try {
-      user = Object(req.user._id)
-  }catch(err){
+    user = Object(req.user._id)
+  } catch (err) {
     return res.status(400).json({ status: 'fail', message: 'Invalid user ID format' });
-  }  
+  }
+  const urlData = await Url.find({ user: user }).select('-_id -__v -user');
 
-    const urlData = await Url.findOneAndReplace({user:user}).select('-_id -__v -user');
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        urlData
-      }
-    });
+  res.status(200).json({
+    status: 'success',
+    results: urlData.length,
+    data: {
+      urlData
+    }
+  });
 });

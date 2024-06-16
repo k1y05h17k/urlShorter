@@ -9,7 +9,6 @@ exports.createUser = (req, res) => {
 };
 
 exports.getUser = catchAsync(async (req, res) => {
-  console.log(req.params.id)
   try {
     const user = await User.findById(req.params.id);
     res.status(200).json({

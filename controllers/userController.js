@@ -3,7 +3,7 @@ const catchAsync = require('./../utils/catchAsync');
 
 exports.createUser = (req, res) => {
   res.status(500).json({
-    staus: 'error',
+    status: 'error',
     message: 'This route is not yet defined'
   });
 };
@@ -12,8 +12,6 @@ exports.getUser = catchAsync(async (req, res) => {
   console.log(req.params.id)
   try {
     const user = await User.findById(req.params.id);
-    // Tour.findOne({ _id: req.params.id })
-    console.log(user);
     res.status(200).json({
       status: 'success',
       data: {
@@ -27,8 +25,3 @@ exports.getUser = catchAsync(async (req, res) => {
     });
   }
 });
-// exports.getAllUsers = factory.getAll(User);
-
-// Do NOT update password with this!
-// exports.updateOne = factory.updateOne(User);
-// exports.deleteUser = factory.deleteOne(User);

@@ -2,11 +2,11 @@ const express = require('express');
 const authController = require('./../controllers/authController');
 const urlController = require('./../controllers/urlController');
 
-const router = express.Router();
+const router = express.Router({ mergeParams:true })
 
 router.post('/shortenUrl',authController.optionalProtect,urlController.shortenUrl);
 
-router.route('/').get(authController.protect,urlController.getAll)
+router.route('/').get(authController.protect,urlController.getAllUrls)
 
 // Add router protect
 router.route('/:urlCode').get(authController.protect,urlController.redirectUrl)

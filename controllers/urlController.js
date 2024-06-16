@@ -11,24 +11,6 @@ dotenv.config();
 // GET URL of dotenv
 const baseUrl = process.env.BASE_URL;
 
-exports.getAll = async (req, res) => {
-  try {
-    const urls = await Url.find().select('-__v -_id -urlCode');
-    res.status(200).json({
-      status: 'success',
-      data: {
-        urls
-      }
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err
-    });
-  }
-};
-
-
 // Function recursive to generate a unicode for url
 
 const generateUniqueUrlCode = async () => {
@@ -65,8 +47,6 @@ exports.shortenUrl = catchAsync(async (req, res, next) => {
   if (![originalUrl].every(validUrl.isUri)) {
     return next(new AppError('You are not logged in! Please log in to get access!', 401));
   }
-  console.log(req.user._id);
-
 
   let url = await Url.findOne({ originalUrl });
 
@@ -76,14 +56,17 @@ exports.shortenUrl = catchAsync(async (req, res, next) => {
   const urlCode = await generateUniqueUrlCode();
   const user = req.user ? req.user._id : null;
   const shortUrl = `${baseUrl}/${urlCode}`;
-  
 
+  // Create a new url object
+  const newUrlData = {
+    originalUrl,
+    shortUrl,
+    urlCode,
+    clicks: 0,
+    user
+  }
 
-console.log(user);
-
-
-
-  const urlCreate = await Url.create({urlCode, user, shortUrl, originalUrl });
+  const urlCreate = await Url.create(newUrlData);
 
   res.status(201).json({
     status: 'success',
@@ -101,10 +84,10 @@ exports.redirectUrl = catchAsync(async (req, res, next) => {
     { new: true }
   );
 
-  // REVIEW --- Verify this message when I dont find vildate url in DB
   if (!url) {
     return next(new AppError('No URL found', 404));
   }
+
   // Redirect to original URL 
   return res.redirect(url.originalUrl);
 
@@ -112,11 +95,10 @@ exports.redirectUrl = catchAsync(async (req, res, next) => {
 
 
 // Update only originalUrl in the request
-
 exports.updateUrl = catchAsync(async (req, res, next) => {
   const urlCode = req.params.urlCode;
   const originalUrl = req.body.originalUrl;
-  await Url.findByIdAndUpdate({ urlCode: urlCode },
+  const urlData = await Url.findByIdAndUpdate({ urlCode: urlCode },
     { originalUrl: originalUrl },
     { updateAt: Date.now },
     {
@@ -128,7 +110,7 @@ exports.updateUrl = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-
+      data: urlData
     }
   })
 })
@@ -142,8 +124,25 @@ exports.deleteUrl = catchAsync(async (req, res, next) => {
     { new: true });
 
   res.status(204).json({
-    staus: 'success',
+    status: 'success',
     data: null
   });
 });
 
+exports.getAllUrls = catchAsync(async (req, res) => {
+    let user;
+  try {
+      user = Object(req.user._id)
+  }catch(err){
+    return res.status(400).json({ status: 'fail', message: 'Invalid user ID format' });
+  }  
+
+    const urlData = await Url.findOneAndReplace({user:user}).select('-_id -__v -user');
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        urlData
+      }
+    });
+});

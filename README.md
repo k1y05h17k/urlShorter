@@ -56,12 +56,16 @@ npm install
 
  ### Run the Application
 
- <p>To start the server, run! </p>
+ To start the server, run!
 
 ```node
 npm start
 ```
 The API wil be available at `http://localhost:3000`
+
+### Import collection in the Postman
+
+
 
 ## API Endpoints
 
@@ -136,7 +140,7 @@ Here are the main endpoints available in the API:
 
 <summary>[POST] /shortenUrl</summary>
 
-<p>If this user is authenticated in the system this API must record the URL</p>
+If this user is authenticated in the system this API must record the URL
 
 - Request Body
 
@@ -211,7 +215,7 @@ Here are the main endpoints available in the API:
 
 <summary>[PATCH]/api/v1/urls:shortUrl</summary>
 
-<p>Update an url</p>
+Update an url
 
 ```json
 {   
@@ -237,7 +241,7 @@ Here are the main endpoints available in the API:
 
 <summary>[DELETE]/api/v1/urls:shortUrl</summary>
 
-<p>Delete an url, keeping the entry in the database with the deletion date </p>
+Delete an url, keeping the entry in the database with the deletion date
 
 
 ```json

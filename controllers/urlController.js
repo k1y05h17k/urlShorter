@@ -44,20 +44,26 @@ exports.shortenUrl = catchAsync(async (req, res, next) => {
 
   // Check this original url is valid
 
-  if (![originalUrl].every(validUrl.isUri)) {
+  if (!validUrl.isUri(originalUrl)) {
     return next(new AppError('You are not logged in! Please log in to get access!', 401));
   }
 
-  let url = await Url.findOne({ originalUrl });
-
-  if (url) {
-    return res.json(url);
-  }
   const urlCode = await generateUniqueUrlCode();
   const user = req.user ? req.user._id : null;
   const shortUrl = `${baseUrl}/${urlCode}`;
 
-  // Create a new url object
+  // Check if URL already exists in the database
+  let url = await Url.findOne({ originalUrl });
+
+  // If the URL is owned by the user, a new short URL will not be created..
+  if (url && user) {
+    return res.json({      
+      originalUrl: url.originalUrl,
+      shortUrl: url.shortUrl
+    });
+  }
+
+   // Create a new url object
   const newUrlData = {
     originalUrl,
     shortUrl,

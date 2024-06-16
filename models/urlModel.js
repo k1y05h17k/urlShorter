@@ -37,13 +37,13 @@ const urlSchema = new mongoose.Schema({
     updateAt:{
         type: Date,
         default: null,
-        select: false
+
     },
 
     deleteAt: {
         type: Date,
         default: null,
-        select: false
+
     }
 
 });

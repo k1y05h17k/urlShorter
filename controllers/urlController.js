@@ -66,11 +66,14 @@ exports.shortenUrl = catchAsync(async (req, res, next) => {
     user
   }
 
-  const urlCreate = await Url.create(newUrlData);
+  const urlCreate = (await Url.create(newUrlData));
 
   res.status(201).json({
     status: 'success',
-    data: urlCreate
+    data: {
+      originalUrl: urlCreate.originalUrl,
+      shortUrl: urlCreate.shortUrl
+    }
   })
 });
 
@@ -96,26 +99,29 @@ exports.redirectUrl = catchAsync(async (req, res, next) => {
 // Update only originalUrl in the request
 exports.updateUrl = catchAsync(async (req, res, next) => {
   const urlCode = req.params.urlCode;
-  const originalUrl = req.body.originalUrl;
+  const newUrl = req.body.originalUrl;
   const urlData = await Url.findOneAndUpdate({ urlCode: urlCode },
     {
-      originalUrl: originalUrl,
+      originalUrl: newUrl,
       updateAt: Date.now()
     },
     {
       new: true,
       runValidators: true
     }
-  ).select('-__v -shortUrl -user +updateAt');
+  );
 
   res.status(200).json({
     status: 'success',
     data: {
-      url: urlData
+      originalUrl: urlData.originalUrl,
+      shortUrl: urlData.shortUrl,
+      clicks:urlData.clicks,
+      createAt:urlData.createAt,
+      updateAt: urlData.updateAt
     }
   })
 })
-
 
 // Delete, this rules mark url with deleted true updated deleteAt to current date
 exports.deleteUrl = catchAsync(async (req, res, next) => {

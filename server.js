@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const swaggerConfig = require('./config/swagger');
+
 // Show the path of request when start
 dotenv.config({path:'./config.env'});
 const app = require('./app');
@@ -23,8 +23,3 @@ const port = process.env.port || 3000;
 app.listen(port,()=>{
     console.log(`App running on port ${port}...`);
 });
-
-
-// Set Swagger
-
-swaggerConfig(app);

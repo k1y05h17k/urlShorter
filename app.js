@@ -8,11 +8,6 @@ const urlRouter = require('./routes/urlRoutes');
 
 const app = express();
 
-// This command show whats enviorement is running
-console.log(process.env.NODE_ENV);
-if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
-};
 
 // Middlewares
 app.use(express.json());
@@ -23,7 +18,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    req.requestTimme = new Date().toISOString();
+    req.requestTime = new Date().toISOString();
     next();
 });
 

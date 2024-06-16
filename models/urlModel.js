@@ -14,6 +14,7 @@ const urlSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please inform a url to shorten']
     },
+
     shortUrl: {
         type: String
     },
@@ -23,9 +24,20 @@ const urlSchema = new mongoose.Schema({
         default: 0
     },
 
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        default: null
+    },
     createAt: {
         type: Date,
         default: Date.now
+    },
+
+    updateAt:{
+        type: Date,
+        default: null,
+        select: false
     },
 
     deleteAt: {
@@ -39,7 +51,12 @@ const urlSchema = new mongoose.Schema({
 // Middleware to filter url diferents of NULL
 urlSchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.find({ deleteAt: null });
+    this.find({ deleteAt: null }).populate({
+        path:'user',
+        select:'name'
+    });
+
+
     next();
 });
 

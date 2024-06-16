@@ -47,7 +47,8 @@ package.json
 {
     "name": "User 1",
     "email": "example@email.com",
-    "password": "test"
+    "password": "test",
+    "confirmPassword":"text"
 }
 ```
 ```json
@@ -88,13 +89,13 @@ package.json
 
 ```json
 {
-    "fullUrl":"http:/teste.com"
+    "fullUrl":"https:/teste.com"
 }
 ```
 
 ```json
 {
-    "shortUrl":"https://localhost:3000/aZbKq7"
+    "shortUrl":"http://localhost:3000/api/v1/urls/aZbKq7"
 }
 
 ```
@@ -102,9 +103,10 @@ package.json
 
 <details open>
 
-<summary>[GET]/shortUrl/</summary>
+<summary>[GET]/api/v1/urls/:code</summary>
 
-<p>GET ALL shortUrls with of number of clicks</p>
+<p>Return list of URL with of number of clicks</p>
+
 
 ```json
 {   
@@ -128,7 +130,7 @@ package.json
 ```
 <details open>
 
-<summary>[GET]/shortUrl/:shorUrl</summary>
+<summary>[GET]/api/v1/urls/:urlCode</summary>
 
 <p>
     GET the expecific short Url
@@ -152,7 +154,7 @@ package.json
 
 <details open>
 
-<summary>[PATCH]/shortUrl/:shortUrl</summary>
+<summary>[PATCH]/api/v1/urls:shortUrl</summary>
 
 <p>Update one url</p>
 
@@ -191,9 +193,9 @@ package.json
 ```
 </details>
 
-<summary>[DELETE]/shortUrl/:shortUrl</summary>
+<summary>[DELETE]/api/v1/urls:shortUrl</summary>
 
-<p>Delete  one url</p>
+<p>Delete url but not your record</p>
 
 
 ```json

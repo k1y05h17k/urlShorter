@@ -1,7 +1,6 @@
 const Url = require('./../models/urlModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
-const factory = require('./handlerFactory');
 const validUrl = require('valid-url');
 const shortid = require('shortid');
 const dotenv = require('dotenv');
@@ -9,10 +8,8 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+// GET URL of dotenv
 const baseUrl = process.env.BASE_URL;
-
-// exports.getAllUrls = factory.getAll(Url);
-// exports.getUrl = factory.getOne(Url);
 
 exports.getAll = async (req, res) => {
   try {
@@ -30,7 +27,6 @@ exports.getAll = async (req, res) => {
     });
   }
 };
-
 
 
 // Function recursive to generate a unicode for url
@@ -64,11 +60,13 @@ exports.shortenUrl = catchAsync(async (req, res, next) => {
   // Normalize the original URL
   originalUrl = normalizeUrl(originalUrl);
 
-  // Chek this original url is valid
+  // Check this original url is valid
 
   if (![originalUrl].every(validUrl.isUri)) {
-      return next(new AppError('You are not logged in! Please log in to get access!', 401));
-    }
+    return next(new AppError('You are not logged in! Please log in to get access!', 401));
+  }
+  console.log(req.user._id);
+
 
   let url = await Url.findOne({ originalUrl });
 
@@ -76,21 +74,20 @@ exports.shortenUrl = catchAsync(async (req, res, next) => {
     return res.json(url);
   }
   const urlCode = await generateUniqueUrlCode();
+  const user = req.user ? req.user._id : null;
   const shortUrl = `${baseUrl}/${urlCode}`;
+  
 
-  const newUrl = {
-          'originalUrl': originalUrl,
-          'shortUrl': shortUrl,
-          urlCode:urlCode,
-          clicks: 0
-  }
 
-  if (req.user) {
-    url = await new Url.create({ newUrl });
-  }
-  res.status(200).json({
+console.log(user);
+
+
+
+  const urlCreate = await Url.create({urlCode, user, shortUrl, originalUrl });
+
+  res.status(201).json({
     status: 'success',
-    data: newUrl
+    data: urlCreate
   })
 });
 
@@ -108,40 +105,39 @@ exports.redirectUrl = catchAsync(async (req, res, next) => {
   if (!url) {
     return next(new AppError('No URL found', 404));
   }
-
   // Redirect to original URL 
   return res.redirect(url.originalUrl);
 
 });
 
 
-// Update only originalUrl
+// Update only originalUrl in the request
 
-exports.updateUrl = catchAsync(async (req, res, next) =>{
-  const code = req.params.code;
+exports.updateUrl = catchAsync(async (req, res, next) => {
+  const urlCode = req.params.urlCode;
   const originalUrl = req.body.originalUrl;
-  await Url.findByIdAndUpdate({urlCode: code},
-    {originalUrl:originalUrl},
-    { new: true,
-      runValidators:true
+  await Url.findByIdAndUpdate({ urlCode: urlCode },
+    { originalUrl: originalUrl },
+    { updateAt: Date.now },
+    {
+      new: true,
+      runValidators: true
     }
   );
 
-    res.status(200).json({
-      status:'success',
-      data:{
-        
-      }
-    })
+  res.status(200).json({
+    status: 'success',
+    data: {
+
+    }
+  })
 })
-
-
 
 
 // Delete, this rules mark url with deleted true updated deleteAt to current date
 exports.deleteUrl = catchAsync(async (req, res, next) => {
-  const code = req.params.code
-  await Url.findByIdAndUpdate({ urlCode: code },
+  const urlCode = req.params.urlCode
+  await Url.findByIdAndUpdate({ urlCode: urlCode },
     { deleteAt: Date.now },
     { new: true });
 

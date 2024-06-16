@@ -65,7 +65,13 @@ The API wil be available at `http://localhost:3000`
 
 ### Import collection in the Postman
 
-
+1. To use the application,
+    - Import collection file  urlShorter to the postman
+    - Create a new environments in the postman
+2. create two variables
+    - The first called url
+    - The second called jwt
+3. This variables are important for tests application in postman
 
 ## API Endpoints
 

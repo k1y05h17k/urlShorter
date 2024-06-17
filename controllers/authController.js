@@ -52,7 +52,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.signin = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;
 
-    // 1) Check if email and password exist
+    // 1) Check if email and password exists
     if (!email || !password) {
         return next(new AppError('Please provide email and password!', 400));
     }
@@ -68,6 +68,7 @@ exports.signin = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
+
     // 1) Getting token and check of it's there
     let token;
     if (
@@ -103,7 +104,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     return next();
 });
 
-
+// Middleware exclusive for route shortenUrl
 exports.optionalProtect = catchAsync(async (req, res, next) => {
 
     let token;
@@ -121,8 +122,6 @@ exports.optionalProtect = catchAsync(async (req, res, next) => {
     }
 
     next();
-
-
 });
 
 

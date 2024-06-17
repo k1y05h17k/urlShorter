@@ -18,6 +18,10 @@ Challenge to create a API for shorter URL`
 - MongoDB
 - Bcrypt
 - JWT
+- Helmet
+- mongoSanitize
+- rateLimit
+- xss
 
 
 ## Folders

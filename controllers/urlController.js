@@ -5,20 +5,18 @@ const validUrl = require('valid-url');
 const shortid = require('shortid');
 const dotenv = require('dotenv');
 
-
 dotenv.config();
 
-// GET URL of dotenv
+// Set BASE URL of dotenv
 const baseUrl = process.env.BASE_URL;
 
 // Function recursive to generate a unicode for url
-
 const generateUniqueUrlCode = async () => {
 
   const urlCode = shortid.generate().slice(0, 6);
   const existingUrl = await Url.findOne({ urlCode });
 
-  // If unicode exists, callbak function again.
+  // If unicode exists, call function again.
   if (existingUrl) {
 
     return generateUniqueUrlCode();
@@ -27,7 +25,6 @@ const generateUniqueUrlCode = async () => {
 }
 
 // Verify if original url contains http:// or https://
-
 const normalizeUrl = (url) => {
   if (!/^https?:\/\//i.test(url)) {
     return `https://${url}`;
@@ -57,13 +54,13 @@ exports.shortenUrl = catchAsync(async (req, res, next) => {
 
   // If the URL is owned by the user, a new short URL will not be created..
   if (url && user) {
-    return res.json({      
+    return res.json({
       originalUrl: url.originalUrl,
       shortUrl: url.shortUrl
     });
   }
 
-   // Create a new url object
+  // Create a new url object
   const newUrlData = {
     originalUrl,
     shortUrl,
@@ -122,8 +119,8 @@ exports.updateUrl = catchAsync(async (req, res, next) => {
     data: {
       originalUrl: urlData.originalUrl,
       shortUrl: urlData.shortUrl,
-      clicks:urlData.clicks,
-      createAt:urlData.createAt,
+      clicks: urlData.clicks,
+      createAt: urlData.createAt,
       updateAt: urlData.updateAt
     }
   })

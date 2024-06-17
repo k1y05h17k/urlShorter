@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 // Show the path of request when start
-dotenv.config({path:'./config.env'});
+dotenv.config({ path: './config.env' });
 const app = require('./app');
 
 // Get the information of config.env to connection with the DB
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
 
 // Create connection with mongoose
-mongoose.connect(DB,{
+mongoose.connect(DB, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -20,6 +20,6 @@ mongoose.connect(DB,{
 
 // Start connection in the LocalHost!
 const port = process.env.port || 3000;
-app.listen(port,()=>{
+app.listen(port, () => {
     console.log(`App running on port ${port}...`);
 });

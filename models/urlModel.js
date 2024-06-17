@@ -34,7 +34,7 @@ const urlSchema = new mongoose.Schema({
         default: Date.now
     },
 
-    updateAt:{
+    updateAt: {
         type: Date,
         default: null,
 
@@ -53,8 +53,8 @@ urlSchema.pre(/^find/, function (next) {
     // this points to the current query
     this.find({ deleteAt: null })
     this.populate({
-        path:'user',
-        select:'name'
+        path: 'user',
+        select: 'name'
     });
     next();
 });
